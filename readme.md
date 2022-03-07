@@ -1,6 +1,6 @@
 # Project to revise and document Bering Sea spatial products
-*Date: 03-02-2022*
-*Author: Jason Conner*
+*Date: 03-02-2022*  
+*Author: Jason Conner*  
 *Collaborators: Duane Stevenson, Lewis Barnett, Sean Rohan*
 
 - Project description: [Google Docs - EBS Spatial Data](https://docs.google.com/document/d/1ib9B3iutfJMquQF4l6fNYqh4Ww1oHmUK8gBvpSUIE8U/)
