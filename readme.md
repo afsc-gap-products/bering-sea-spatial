@@ -16,5 +16,6 @@ Bering Sea Slope shapefile projection - EPSG:4269
 - 200m contour was made contiguous to the BS slope shapefiles
 - EBS and NBS made contiguous
 - Boundary artifact polygon removed 
-- Shapefiles exclude landmass using the [ARDEM dataset](http://research.cfos.uaf.edu/bathy/) (downloaded on 12/29/2017) at 0.0 elevation
+- Shapefiles exclude landmass using the [ARDEM dataset](http://research.cfos.uaf.edu/bathy/) (downloaded on 12/29/2017) at 0.0 elevation *settings for ARDEM transformation/conversion not recorded, if depth limits are changed to 20m in the future, research into optimum settings is advised*
 - NBS extent excludes station **AA-10** which was dropped from sampling beginning in 2017
+- Southern border of the Chukchi Sea survey extent altered for contiguity
