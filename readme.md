@@ -1,5 +1,5 @@
 # Project to revise and document Bering Sea spatial products
-*Date: 03-02-2022*  
+*Date: 03-17-2022*  
 *Author: Jason Conner*  
 *Collaborators: Duane Stevenson, Lewis Barnett, Sean Rohan*
 
