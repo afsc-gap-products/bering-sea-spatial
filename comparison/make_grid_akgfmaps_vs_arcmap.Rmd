@@ -1,0 +1,116 @@
+---
+title: "Compare ArcMap and akgfmaps grids in the EBS and NBS"
+date: "3/16/2022"
+output: word_document
+---
+
+## Compare ArcMap and akgfmaps grids in the EBS and NBS
+
+The purpose of this analysis is to compare EBS and NBS grids generated using the fishnet tool and area calculator in ArcMap to grids generated using the akgfmaps::make_2d_grid function. The goal for the akgfmaps::make_2d_grid function is to reproduce results of grid production methods in ArcMap.
+
+Grids are used as interpolation grids in VAST.
+
+```{r load, include=FALSE}
+library(akgfmaps) # Version >= 1.8.0
+```
+
+```{r setup, message=FALSE, warning=FALSE, echo=TRUE}
+# Load Jason's csv output
+arcmap_ebs <- read.csv(file = here::here("data", "VAST_raster_EBS_2022.csv"), stringsAsFactors = FALSE)
+arcmap_nbs <- read.csv(file = here::here("data", "VAST_raster_NBS_2022.csv"), stringsAsFactors = FALSE)
+
+# Setup connection to spatial products gdb
+dsn <- here::here("C:/Users/sean.rohan/Work/afsc/WIP", "Bering_Sea_Spatial_Products_2022.gdb")
+
+# Setup grid using dimensions from Jason's template
+vast_bbox = c(xmin = -2846314.206900,
+         ymin = 251495.775400,
+         xmax = 2128157.793100,
+         ymax = 2859111.775400)
+
+res <- c(3704, 3704)
+```
+
+
+## Make grids using akgfmaps::make_2d_grid
+
+```{r make_2d_grid, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE}
+ebs_grid <- akgfmaps:::make_2d_grid(obj = sf::st_read(dsn = dsn,
+                                                      layer = "EBS_strata_Conner2022"),
+                                    resolution = res,
+                                    bbox = vast_bbox,
+                                    output_type = "point")
+
+nbs_grid <- akgfmaps:::make_2d_grid(obj = sf::st_read(dsn = dsn,
+                                                      layer = "NBS_strata_Conner2022"),
+                                    resolution = res,
+                                    bbox = vast_bbox,
+                                    output_type = "point")
+```
+
+
+## Total stratum areas
+
+Calculate total stratum areas from ArcMap and akgfmaps for the EBS and NBS.
+
+```{r calculate_areas, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
+stratum_total_arcmap_ebs <- arcmap_ebs %>%
+  dplyr::group_by(Stratum) %>%
+  dplyr::summarise(Stratum_Area = sum(Shape_Area/1e6))
+
+stratum_total_akgfmaps_ebs <- ebs_grid %>%
+  as.data.frame() %>%
+  dplyr::group_by(Stratum) %>%
+  dplyr::summarise(Stratum_Area = sum(as.numeric(AREA)/1e6))
+
+stratum_total_arcmap_nbs <- nbs_grid %>%
+  as.data.frame() %>%
+  dplyr::group_by(Stratum) %>%
+  dplyr::summarise(Stratum_Area = sum(as.numeric(AREA)/1e6))
+
+stratum_total_akgfmaps_nbs <- nbs_grid %>%
+  as.data.frame() %>%
+  dplyr::group_by(Stratum) %>%
+  dplyr::summarise(Stratum_Area = sum(as.numeric(AREA)/1e6))
+```
+
+
+## Check for differences in number of cells
+
+
+```{r nrow_ebs}
+nrow(ebs_grid)
+nrow(arcmap_ebs)
+
+table(ebs_grid$Stratum)
+table(arcmap_ebs$Stratum)
+```
+
+```{r nrow_nbs}
+nrow(nbs_grid)
+nrow(arcmap_nbs)
+
+table(nbs_grid$Stratum)
+table(arcmap_nbs$Stratum)
+```
+
+EBS and NBS grids from akgfmaps and ArcMap have the same number of cells.
+
+
+## Check for differences in total stratum area
+
+```{r stratum area}
+(stratum_total_arcmap_ebs$Stratum_Area - stratum_total_akgfmaps_ebs$Stratum_Area)
+stratum_total_arcmap_nbs$Stratum_Area - stratum_total_akgfmaps_nbs$Stratum_Area
+```
+
+EBS differences in total stratum area on the order of 1.2-48.8 m^2. NBS has no differences in total stratum area.
+
+
+## Example: Transform to WGS84
+
+Transforming the grid points to WGS84 (EPSG:4326)
+
+```{r ex_transform}
+sf::st_transform(ebs_grid, crs = "EPSG:4326")
+```
