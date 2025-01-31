@@ -20,7 +20,7 @@ arcmap_ebs <- read.csv(file = here::here("data", "VAST_raster_EBS_2022.csv"), st
 arcmap_nbs <- read.csv(file = here::here("data", "VAST_raster_NBS_2022.csv"), stringsAsFactors = FALSE)
 
 # Setup connection to spatial products gdb
-dsn <- here::here("C:/Users/sean.rohan/Work/afsc/WIP", "Bering_Sea_Spatial_Products_2022.gdb")
+dsn <- here::here("arcmap", "Bering_Sea_Spatial_Products_2022.gdb")
 
 # Setup grid using dimensions from Jason's template
 vast_bbox = c(xmin = -2846314.206900,
