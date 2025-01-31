@@ -128,7 +128,7 @@ nbs_grid_lores <- akgfmaps:::make_2d_grid(obj = dplyr::filter(ebs_layers$survey.
                                     include_tile_center = TRUE) |>
   sf::st_transform(crs = "EPSG:32602")
 
-ebs_grid_lores[, c('LON_UTM', "LAT_UTM")] <- sf::st_coordinates(nbs_grid_lores)
+nbs_grid_lores[, c('LON_UTM', "LAT_UTM")] <- sf::st_coordinates(nbs_grid_lores)
 
 # Equal area plot using grid cell centroid
 ggplot() +
