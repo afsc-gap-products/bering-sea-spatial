@@ -1,6 +1,6 @@
 ---
 title: "Compare ArcMap and akgfmaps grids in the EBS and NBS"
-date: "3/16/2022"
+date: "1/31/2024"
 output: word_document
 ---
 
@@ -105,6 +105,53 @@ stratum_total_arcmap_nbs$Stratum_Area - stratum_total_akgfmaps_nbs$Stratum_Area
 ```
 
 EBS differences in total stratum area on the order of 1.2-48.8 m^2. NBS has no differences in total stratum area.
+
+
+## Coarsened grid
+
+```{r make_2d_grid, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE}
+ebs_layers <- akgfmaps::get_base_layers(select.region = "ebs", set.crs = "EPSG:3338")
+
+ebs_grid_lores <- akgfmaps:::make_2d_grid(obj = dplyr::filter(ebs_layers$survey.strata, SURVEY_DEFINITION_ID == 98),
+                                    resolution = c(3704, 3704)*6,
+                                    bbox = vast_bbox,
+                                    output_type = "point",
+                                    include_tile_center = TRUE) |>
+  sf::st_transform(crs = "EPSG:32602")
+
+ebs_grid_lores[, c('LON_UTM', "LAT_UTM")] <- sf::st_coordinates(ebs_grid_lores)
+
+nbs_grid_lores <- akgfmaps:::make_2d_grid(obj = dplyr::filter(ebs_layers$survey.strata, SURVEY_DEFINITION_ID == 143),
+                                    resolution = c(3704, 3704)*6,
+                                    bbox = vast_bbox,
+                                    output_type = "point",
+                                    include_tile_center = TRUE) |>
+  sf::st_transform(crs = "EPSG:32602")
+
+ebs_grid_lores[, c('LON_UTM', "LAT_UTM")] <- sf::st_coordinates(nbs_grid_lores)
+
+# Equal area plot using grid cell centroid
+ggplot() +
+  geom_tile(data = ebs_grid_lores,
+            mapping = aes(x = X, y = Y, fill = as.numeric(AREA)))
+
+ebs_grid_lores_area <- ebs_grid_lores |>
+  dplyr::select(-AREA_M2) |>
+  as.data.frame() |>
+  dplyr::group_by(STRATUM) |>
+  dplyr::summarise(STRATUM_AREA_KM2 = sum(as.numeric(AREA)/1e6))
+
+nbs_grid_lores_area <- nbs_grid_lores |>
+  dplyr::select(-AREA_M2) |>
+  as.data.frame() |>
+  dplyr::group_by(STRATUM) |>
+  dplyr::summarise(STRATUM_AREA_KM2 = sum(as.numeric(AREA)/1e6))
+
+
+ebs_grid_lores_area$STRATUM_AREA_KM2 - stratum_total_arcmap_ebs$Stratum_Area
+
+nbs_grid_lores_area$STRATUM_AREA_KM2 - stratum_total_arcmap_nbs$Stratum_Area
+```
 
 
 ## Example: Transform to WGS84
