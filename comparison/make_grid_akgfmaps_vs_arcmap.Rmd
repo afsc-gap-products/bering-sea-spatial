@@ -56,17 +56,17 @@ Calculate total stratum areas from ArcMap and akgfmaps for the EBS and NBS.
 ```{r calculate_areas, message=FALSE, warning=FALSE, include=TRUE, echo=FALSE}
 stratum_total_arcmap_ebs <- arcmap_ebs %>%
   dplyr::group_by(Stratum) %>%
-  dplyr::summarise(Stratum_Area = sum(Shape_Area/1e6))
+  dplyr::summarise(Stratum_Area = sum(Area_KM2))
 
 stratum_total_akgfmaps_ebs <- ebs_grid %>%
   as.data.frame() %>%
   dplyr::group_by(Stratum) %>%
   dplyr::summarise(Stratum_Area = sum(as.numeric(AREA)/1e6))
 
-stratum_total_arcmap_nbs <- nbs_grid %>%
+stratum_total_arcmap_nbs <- arcmap_nbs %>%
   as.data.frame() %>%
   dplyr::group_by(Stratum) %>%
-  dplyr::summarise(Stratum_Area = sum(as.numeric(AREA)/1e6))
+  dplyr::summarise(Stratum_Area = sum(as.numeric(Area_KM2)))
 
 stratum_total_akgfmaps_nbs <- nbs_grid %>%
   as.data.frame() %>%
